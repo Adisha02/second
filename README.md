@@ -1,74 +1,70 @@
-<<<<<<< HEAD
-# Getting Started with Create React App
+# 🖼️ NFT Minting DApp
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack decentralized application (DApp) built with React and Ethers.js v6 that allows users to mint NFTs by entering a metadata URL. This project interacts with a deployed ERC-721 smart contract on the Avalanche Fuji testnet.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## ✨ Features
 
-### `npm start`
+- 🔗 Connect MetaMask Wallet
+- 🖼️ Mint NFTs via metadata URL (e.g., hosted on IPFS)
+- ⛓️ Built for Avalanche Fuji testnet (Chain ID: 43113)
+- ⚡ Powered by Ethers.js v6.13.5
+- 🌍 Deployed frontend via Vercel
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🧠 Prerequisites
 
-### `npm test`
+Before getting started, ensure you have the following installed:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js (v18 or later)
+- MetaMask browser extension
+- Avalanche Fuji testnet configured in MetaMask
+- GitHub account for cloning
+- Vercel account for deployment (optional)
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🚀 Getting Started
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 1. Clone the Repository
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```bash
+git clone https://github.com/Adisha02/mint-dapp.git
+cd mint-dapp
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+INSTALL DEPENDENCIES
+npm install
+Add Smart Contract Info
+Create a file called src/contract.js and paste the following content:
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+js
+Copy
+Edit
+Replace these values with your deployed contract details
+export const contractAddress = "YOUR_CONTRACT_ADDRESS_HERE";
+export const contractABI = [
+  // Paste your contract ABI here
+];
+mint-dapp/
+├── public/
+│   └── index.html
+├── src/
+│   ├── App.js         // Main React component
+│   ├── contract.js    // Contract address & ABI
+│   └── App.css        // Basic styling
+├── package.json
+└── README.md
+Metadata Format Example (metadata.json)
+Make sure your metadata URL points to a file like this:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-=======
-# mint-dapp
->>>>>>> 9a1a9a0422d671337e399e93146e41d214b01038
+json
+Copy
+Edit
+{
+  "name": "My Cool NFT",
+  "description": "An awesome NFT for Web3",
+  "image": "https://ipfs.io/ipfs/<your-image-hash>"
+}
