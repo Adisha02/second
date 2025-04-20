@@ -1,112 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import { ethers } from 'ethers'; // Import directly from ethers
-import { contractAddress, contractABI } from './contract'; // Import contract address and ABI
+// src/App.js
+import React, { useState } from 'react';
+import { BrowserProvider, Contract } from 'ethers';
+import { contractAddress, contractABI } from './contract';
 import './App.css';
 
-const App = () => {
+function App() {
   const [account, setAccount] = useState(null);
-  const [contract, setContract] = useState(null);
-  const [nfts, setNfts] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [minting, setMinting] = useState(false);
-  const [tokenURI, setTokenURI] = useState('');
+  const [metadataURL, setMetadataURL] = useState('');
+  const [status, setStatus] = useState('');
 
-  // Initialize contract when MetaMask is connected
-  useEffect(() => {
-    if (window.ethereum) {
-      const provider = new ethers.Web3Provider(window.ethereum); // Using Web3Provider from ethers
+  const connectWallet = async () => {
+    try {
+      if (!window.ethereum) throw new Error('MetaMask not detected');
 
-      // Request account access if needed
-      window.ethereum.request({ method: 'eth_requestAccounts' })
-        .then(accounts => {
-          setAccount(accounts[0]);  // Set the first account to state
-        })
-        .catch(err => {
-          console.error('Error accessing MetaMask accounts', err);
-          alert('Please connect your MetaMask wallet!');
-        });
+      const provider = new BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+      const userAddress = await signer.getAddress();
 
-      // Initialize the contract with the signer
-      const signer = provider.getSigner();
-      const contractInstance = new ethers.Contract(contractAddress, contractABI, signer);
-      setContract(contractInstance);
-    } else {
-      alert('Please install MetaMask!');
-    }
-  }, []);
-
-  // Fetch all NFTs from the contract
-  const fetchNFTs = async () => {
-    if (contract) {
-      setIsLoading(true);
-      const totalSupply = await contract.totalSupply();
-      const nftArray = [];
-      for (let i = 0; i < totalSupply; i++) {
-        try {
-          const owner = await contract.ownerOf(i);
-          nftArray.push({ tokenId: i, owner });
-        } catch (err) {
-          console.error(err);
-        }
+      const network = await provider.getNetwork();
+      if (network.chainId !== 43113n) {
+        throw new Error('Please connect to Avalanche Fuji (chainId 43113)');
       }
-      setNfts(nftArray);
-      setIsLoading(false);
+
+      setAccount(userAddress);
+      setStatus('Wallet connected ✅');
+    } catch (err) {
+      console.error(err);
+      setStatus(`Connection error: ${err.message}`);
     }
   };
 
-  // Handle minting NFT
   const mintNFT = async () => {
-    if (contract && tokenURI) {
-      setMinting(true);
-      try {
-        const transaction = await contract.mint(account, tokenURI);
-        await transaction.wait();
-        alert('NFT minted successfully!');
-        fetchNFTs(); // Refresh the list of NFTs after minting
-      } catch (err) {
-        console.error(err);
-        alert('Minting failed. Please try again.');
-      } finally {
-        setMinting(false);
-      }
-    } else {
-      alert('Please provide a valid token URI!');
+    if (!metadataURL) {
+      setStatus('Please enter a metadata URL');
+      return;
+    }
+
+    try {
+      const provider = new BrowserProvider(window.ethereum);
+      const signer = await provider.getSigner();
+
+      const contract = new Contract(contractAddress, contractABI, signer);
+
+      setStatus('Minting in progress... ⛏️');
+      const tx = await contract.safeMint(account, metadataURL);
+      await tx.wait();
+
+      setStatus(`✅ NFT minted! Tx hash: ${tx.hash}`);
+      setMetadataURL('');
+    } catch (err) {
+      console.error(err);
+      setStatus(`Minting failed: ${err.message}`);
     }
   };
 
   return (
     <div className="App">
-      <h1>Mint Your NFT</h1>
-      {account ? (
-        <>
-          <p>Connected account: {account}</p>
-          <button onClick={fetchNFTs} disabled={isLoading}>Fetch NFTs</button>
-          <div>
-            <input
-              type="text"
-              placeholder="Enter token URI"
-              value={tokenURI}
-              onChange={(e) => setTokenURI(e.target.value)}
-            />
-            <button onClick={mintNFT} disabled={minting}>Mint NFT</button>
-          </div>
-          <div>
-            {isLoading ? (
-              <p>Loading NFTs...</p>
-            ) : (
-              <ul>
-                {nfts.map((nft) => (
-                  <li key={nft.tokenId}>Token ID: {nft.tokenId}, Owner: {nft.owner}</li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </>
+      <h1>Mint Your NFT 🖼️</h1>
+
+      {!account ? (
+        <button onClick={connectWallet}>Connect Wallet</button>
       ) : (
-        <p>Please connect your MetaMask wallet!</p>
+        <p>Connected as: {account}</p>
       )}
+
+      <input
+        type="text"
+        placeholder="Enter metadata URL (e.g. https://.../metadata.json)"
+        value={metadataURL}
+        onChange={(e) => setMetadataURL(e.target.value)}
+        style={{ width: '400px', padding: '10px', marginTop: '10px' }}
+      />
+
+      <br />
+      <button onClick={mintNFT} style={{ marginTop: '10px' }}>Mint NFT</button>
+
+      <p>{status}</p>
     </div>
   );
-};
+}
 
 export default App;
